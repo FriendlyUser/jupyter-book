@@ -12,7 +12,7 @@ jobs:
           keys:
             - cache-pip
 
-      - run: pip install --user .[testing,sphinx,pdfhtml]
+      - run: pip install --user .[sphinx,pdfhtml]
       - save_cache:
           key: cache-pip
           paths:
@@ -27,10 +27,6 @@ jobs:
           name: Install chromium
           command: pyppeteer-install
 
-      - run:
-          name: Run pytest for pdfhtml
-          command: pytest -m 'requires_chrome'
-
       # Build a PDF of the book to view as an artifact
       - run:
           name: PDF from HTML
@@ -38,7 +34,7 @@ jobs:
 
       - store_artifacts:
           path: docs/_build/pdf/book.pdf
-          destination: pdf
+          destination: pdfhtml
 
   pdflatex:
     docker:
@@ -50,7 +46,7 @@ jobs:
       - restore_cache:
           keys:
             - cache-pip
-      - run: pip install --user .[testing,sphinx,pdflatex]
+      - run: pip install --user .[sphinx,pdflatex]
       - save_cache:
           key: cache-pip
           paths:
@@ -69,23 +65,12 @@ jobs:
           key: texlive
           paths:
             - /tmp/texlive
-
-      - run:
-          name: Run pytest for pdflatex
-          command: pytest -m 'requires_tex'
-
-      # Build quantecon-mini-example project as a test case
-      # TODO: revert this to building docs/ when we've added support for svg, gif, etc
       - run:
           name: PDF from LaTeX
-          command: |
-            git clone https://github.com/executablebooks/quantecon-mini-example.git
-            cd quantecon-mini-example/
-            pip install -r requirements.txt
-            jb build mini_book --builder pdflatex -n -W --keep-going
+          command: jb build docs --builder pdflatex -n -W --keep-going
 
       - store_artifacts:
-          path: quantecon-mini-example/mini_book/_build/latex/book.pdf
+          path: docs/_build/latex/book.pdf
           destination: pdflatex
 
 workflows:
