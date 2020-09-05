@@ -1,27 +1,5 @@
 version: 2
 jobs:
-  tests:
-    docker:
-      - image: circleci/python:3.6-stretch
-    steps:
-      # Get our data and merge with upstream
-      - run: sudo apt-get update
-      - checkout
-
-      - restore_cache:
-          keys:
-            - cache-pip
-
-      - run: pip install --user .[testing]
-      - save_cache:
-          key: cache-pip
-          paths:
-            - ~/.cache/pip
-
-      # Make sure tests build in CircleCI (so we can preview w/ SSH if we wish)
-      - run:
-          name: Run pytest
-          command: pytest -m 'not requires_chrome and not requires_tex'
 
   pdfhtml:
     docker:
@@ -56,7 +34,7 @@ jobs:
       # Build a PDF of the book to view as an artifact
       - run:
           name: PDF from HTML
-          command: jb build docs --builder pdfhtml
+          command: jb build docs --builder pdfhtml -n -W --keep-going
 
       - store_artifacts:
           path: docs/_build/pdf/book.pdf
@@ -104,7 +82,7 @@ jobs:
             git clone https://github.com/executablebooks/quantecon-mini-example.git
             cd quantecon-mini-example/
             pip install -r requirements.txt
-            jb build mini_book --builder pdflatex
+            jb build mini_book --builder pdflatex -n -W --keep-going
 
       - store_artifacts:
           path: quantecon-mini-example/mini_book/_build/latex/book.pdf
@@ -114,6 +92,5 @@ workflows:
   version: 2
   default:
     jobs:
-      - tests
       - pdfhtml
       - pdflatex
