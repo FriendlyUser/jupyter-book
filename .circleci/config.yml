@@ -12,7 +12,7 @@ jobs:
           keys:
             - cache-pip
 
-      - run: pip install --user .[testing,pdfhtml]
+      - run: pip install --user .[testing,sphinx,pdfhtml]
       - save_cache:
           key: cache-pip
           paths:
@@ -50,7 +50,7 @@ jobs:
       - restore_cache:
           keys:
             - cache-pip
-      - run: pip install --user .[testing,pdflatex]
+      - run: pip install --user .[testing,sphinx,pdflatex]
       - save_cache:
           key: cache-pip
           paths:
